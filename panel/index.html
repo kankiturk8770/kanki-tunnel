@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Kanki Tunnel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#000;--panel:#0c0c0c;--panel2:#141414;--line:#262626;--soft:#1a1a1a;
+  --ink:#f5f5f0;--dim:#8d8d86;--faint:#5c5c57;
+  --y:#ffe000;--ydim:#b8a100;--g:#38f08a;--r:#ff5252;--rad:14px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;color:var(--ink);font:15px/1.65 Vazirmatn,system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(900px 500px at 100% -10%,rgba(255,224,0,.06),transparent 60%),var(--bg)}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;font-weight:700}
+button,input,textarea{font-family:inherit}button{cursor:pointer}
+.hidden{display:none!important}
+:focus-visible{outline:2px solid var(--y);outline-offset:2px}
+
+/* brand */
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:32px;height:32px;border-radius:9px;background:var(--y);color:#000;display:grid;place-items:center;font-weight:800;font-size:18px;box-shadow:0 0 22px rgba(255,224,0,.4)}
+.bname{font-weight:800;font-size:19px;letter-spacing:.01em}.bname b{color:var(--y)}
+
+/* login */
+.login{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
+.lcard{width:100%;max-width:360px;background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:40px 28px 28px;position:relative;overflow:hidden}
+.lcard::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,transparent,var(--y),transparent)}
+.lcard .brand{justify-content:center;margin-bottom:6px}
+.lsub{text-align:center;color:var(--dim);font-size:13px;margin:0 0 26px}
+.lfoot{text-align:center;color:var(--faint);font-size:11.5px;margin-top:16px}
+.lang{position:absolute;top:14px;inset-inline-end:14px}
+
+/* controls */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12.5px;color:var(--dim);margin-bottom:6px}
+.input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px 13px;font-size:15px;transition:border-color .15s,box-shadow .15s}
+.input:focus{outline:none;border-color:var(--y);box-shadow:0 0 0 3px rgba(255,224,0,.12)}
+.input.err{border-color:var(--r)}
+.input[readonly]{color:var(--dim)}
+textarea.input{resize:vertical;min-height:70px;font-size:12.5px}
+.btn{border:none;border-radius:10px;padding:12px 18px;font-size:15px;font-weight:700;background:var(--y);color:#000;transition:filter .15s}
+.btn:hover{filter:brightness(1.07)}
+.btn.full{width:100%}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--dim);filter:none}
+.btn.g{background:var(--g)}
+.chip{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:6px 11px;font-size:12.5px;font-weight:600}
+.chip:hover{color:var(--y);border-color:var(--ydim)}
+
+/* shell */
+.app{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;padding:13px 18px;padding-top:calc(13px + env(safe-area-inset-top,0px));margin-top:calc(-1 * env(safe-area-inset-top,0px));background:rgba(0,0,0,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .mark{width:27px;height:27px;font-size:15px}.top .bname{font-size:16px}
+.sp{flex:1}
+.main{flex:1;display:flex;width:100%;max-width:1100px;margin:0 auto}
+.nav{width:200px;flex:none;padding:18px 12px;border-inline-end:1px solid var(--line)}
+.ni{display:flex;align-items:center;gap:10px;width:100%;text-align:start;background:none;border:1px solid transparent;color:var(--dim);padding:11px 13px;border-radius:10px;margin-bottom:4px;font-size:14px;font-weight:500}
+.ni:hover{color:var(--ink);background:var(--panel)}
+.ni.on{color:var(--ink);background:var(--panel);border-color:var(--line)}
+.ni .d{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.ni.on .d{background:var(--y);box-shadow:0 0 10px var(--y)}
+.content{flex:1;min-width:0;padding:26px 24px 70px}
+.ph{margin-bottom:20px}.ph h2{font-size:22px;margin-bottom:3px}.ph p{margin:0;color:var(--dim);font-size:13.5px}
+
+/* dashboard */
+.servers{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:12px}
+.srv{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:18px}
+.srv .h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.srv .t{font-weight:700}
+.srv .ip{color:var(--dim);font-size:13px}
+.srv .kv{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);padding:6px 0;border-top:1px solid var(--soft)}
+.srv .kv span:last-child{color:var(--ink)}
+.led{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--g)}
+.led::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--g);box-shadow:0 0 9px var(--g)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.st{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:15px 16px}
+.st .k{font-size:12px;color:var(--dim);margin-bottom:6px}
+.st .v{font-size:23px;font-weight:700}.st .v small{font-size:12.5px;color:var(--dim);font-weight:500}
+.st .v.y{color:var(--y)}
+
+/* transport selector */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.opt{text-align:start;background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:15px 16px;color:var(--ink)}
+.opt .n{font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.opt .s{font-size:12.5px;color:var(--dim);margin-top:4px;line-height:1.6}
+.opt .tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid currentColor}
+.opt.on{border-color:var(--y);background:rgba(255,224,0,.05)}
+.opt.on.game{border-color:var(--g);background:rgba(56,240,138,.05)}
+.opt.game .tag{color:var(--g)}.opt.st .tag{color:var(--y)}
+@media(max-width:560px){.seg{grid-template-columns:1fr}}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--rad);padding:22px;margin-bottom:16px}
+.ct{font-size:15px;font-weight:700;margin-bottom:3px}
+.cn{font-size:12.5px;color:var(--dim);margin-bottom:18px;line-height:1.75}
+.cn b{color:var(--ink)}
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);background:var(--panel2);border:1px solid var(--soft);border-radius:10px;padding:10px 13px;margin-bottom:18px}
+.flow .node{color:var(--ink);font-weight:600}
+.flow .arr{color:var(--y)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+@media(max-width:560px){.g2{grid-template-columns:1fr}}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-top:1px solid var(--soft)}
+.sw .l{font-size:14px}.sw .s{font-size:12px;color:var(--dim);margin-top:2px}
+.tg{width:44px;height:25px;flex:none;border-radius:20px;background:var(--panel2);border:1px solid var(--line);position:relative;padding:0}
+.tg::after{content:"";position:absolute;top:2px;inset-inline-start:2px;width:19px;height:19px;border-radius:50%;background:var(--faint);transition:transform .18s,background .18s}
+.tg[aria-checked=true]{background:rgba(255,224,0,.18);border-color:var(--ydim)}
+.tg[aria-checked=true]::after{background:var(--y);transform:translateX(-19px)}
+[dir=ltr] .tg[aria-checked=true]::after{transform:translateX(19px)}
+.presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.pr{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:9px;padding:8px 13px;font-size:13px;font-weight:600}
+.pr.on{border-color:var(--g);color:var(--g);background:rgba(56,240,138,.08)}
+.actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.actions .btn{flex:1;min-width:150px}
+.errmsg{color:var(--r);font-size:12.5px;margin-top:10px}
+
+/* result */
+.res{border-color:var(--ydim)}
+.res h3{font-size:15px;margin-bottom:4px}
+.step{display:flex;gap:11px;margin-top:16px}
+.step .num{width:24px;height:24px;flex:none;border-radius:50%;background:var(--y);color:#000;font-weight:800;font-size:13px;display:grid;place-items:center}
+.step .b{flex:1;min-width:0}
+.step .b p{margin:0 0 8px;font-size:13px;color:var(--dim)}
+.code{position:relative;background:#050505;border:1px solid var(--soft);border-radius:10px;padding:12px 13px;font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre;direction:ltr;text-align:left;color:#d8d8d0}
+.copy{position:absolute;top:7px;right:7px;font-size:11px;padding:4px 9px}
+
+/* list */
+.tl{display:flex;flex-direction:column;gap:8px}
+.tr{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--soft);border-radius:11px;padding:11px 13px}
+.tr .nm{font-weight:600;font-size:14px}
+.tr .mt{font-size:12px;color:var(--dim)}
+.tr .bd{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid currentColor;margin-inline-start:6px}
+.bd.st{color:var(--y)}.bd.game{color:var(--g)}
+.del{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:5px 10px;font-size:12px}
+.del:hover{color:var(--r);border-color:var(--r)}
+.empty{font-size:13px;color:var(--faint);padding:6px 0}
+
+.toast{position:fixed;inset-inline:0;bottom:calc(22px + env(safe-area-inset-bottom,0px));margin:auto;width:max-content;max-width:90%;background:var(--panel);border:1px solid var(--ydim);padding:12px 18px;border-radius:11px;font-size:13.5px;font-weight:600;z-index:60;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+
+@media(max-width:760px){
+  .main{flex-direction:column}
+  .nav{width:100%;display:flex;gap:6px;overflow-x:auto;border-inline-end:none;border-bottom:1px solid var(--line);padding:10px}
+  .ni{width:auto;white-space:nowrap;margin:0}
+  .content{padding:20px 15px 70px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.state{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;white-space:nowrap}
+.state::before{content:"";width:8px;height:8px;border-radius:50%}
+.state.active{color:var(--g)}.state.active::before{background:var(--g);box-shadow:0 0 9px var(--g)}
+.state.off{color:var(--r)}.state.off::before{background:var(--r)}
+.side{font-size:10.5px;color:var(--dim);border:1px solid var(--line);border-radius:20px;padding:1px 7px;margin-inline-start:6px}
+.warn{background:rgba(255,82,82,.06);border:1px solid rgba(255,82,82,.35);color:#ffb3b3;border-radius:10px;padding:11px 13px;font-size:12.5px;margin-bottom:16px}
+.acts{display:flex;gap:6px}
+</style>
+</head>
+<body>
+<div class="login hidden" id="login">
+  <div class="lcard">
+    <button class="chip lang" onclick="toggleLang()" data-lang-btn>EN</button>
+    <div class="brand"><div class="mark">K</div><div class="bname">Kanki<b> Tunnel</b></div></div>
+    <p class="lsub" data-i="loginSub"></p>
+    <div class="field"><label for="pw" data-i="password"></label>
+      <input id="pw" class="input mono" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+    <button class="btn full" id="loginBtn" onclick="login()" data-i="signIn"></button>
+    <div class="errmsg hidden" id="loginErr"></div>
+    <div class="lfoot" data-i="loginFoot"></div>
+  </div>
+</div>
+
+<div class="app hidden" id="app">
+  <header class="top">
+    <div class="brand"><div class="mark">K</div><div class="bname">Kanki<b> Tunnel</b></div></div>
+    <div class="sp"></div>
+    <button class="chip" onclick="toggleLang()" data-lang-btn>EN</button>
+    <button class="chip" onclick="logout()" data-i="logout"></button>
+  </header>
+  <div class="main">
+    <nav class="nav">
+      <button class="ni on" data-p="dash" onclick="go('dash')"><span class="d"></span><span data-i="navDash"></span></button>
+      <button class="ni" data-p="reverse" onclick="go('reverse')"><span class="d"></span><span data-i="navReverse"></span></button>
+      <button class="ni" data-p="direct" onclick="go('direct')"><span class="d"></span><span data-i="navDirect"></span></button>
+      <button class="ni" data-p="join" onclick="go('join')"><span class="d"></span><span data-i="navJoin"></span></button>
+    </nav>
+    <main class="content" id="content"></main>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const I={
+ fa:{
+  loginSub:'ورود به پنل مدیریت تانل',password:'رمز عبور',signIn:'ورود',loginFoot:'بدون نام کاربری — فقط رمز',
+  badPw:'رمز اشتباه است',emptyPw:'رمز را وارد کن',blocked:'تلاش‌های زیاد؛ ۱۵ دقیقه صبر کن',logout:'خروج',
+  navDash:'داشبورد',navReverse:'تانل ریورز',navDirect:'تانل دایرکت',navJoin:'اتصال با لینک',
+  dashT:'داشبورد',dashS:'وضعیت همین سرور و تانل‌هایش',thisSrv:'این سرور',online:'آنلاین',
+  cpu:'پردازنده',ram:'حافظه',upt:'روشن بودن',hours:'ساعت',
+  sTun:'کل تانل‌ها',sAct:'تانل‌های فعال',engineOk:'موتور BackPack نصب است',engineNo:'موتور BackPack پیدا نشد — install.sh را دوباره اجرا کن',
+  revT:'تانل ریورز',revS:'سرور ایران منتظر می‌ماند و سرور خارج به آن وصل می‌شود',
+  dirT:'تانل دایرکت',dirS:'سرور ایران خودش به سرور خارج وصل می‌شود',
+  revWhen:'<b>کِی ریورز؟</b> وقتی سرور ایران می‌تواند اتصال ورودی از خارج بگیرد. رایج‌ترین حالت و نقطهٔ شروع مناسب.',
+  dirWhen:'<b>کِی دایرکت؟</b> وقتی ریورز وصل نمی‌شود چون دیتاسنتر ایران اتصال ورودی از خارج را می‌بندد. اینجا ایران خودش بیرون می‌زند که معمولاً فیلتر نمی‌شود.',
+  stName:'TCP + Stealth',stTag:'ضدفیلتر',
+  stDesc:'ترافیک در لایهٔ Noise رمز می‌شود و الگویی برای DPI باقی نمی‌ماند. برای V2Ray، پنل‌ها و وقتی خودِ اتصال فیلتر می‌شود.',
+  gmNameRev:'UDP + KCP + FEC',gmNameDir:'UDP + FEC',gmTag:'گیمینگ',
+  gmDescRev:'کمترین تأخیر؛ افت پکت بدون انتظار برای ارسال مجدد جبران می‌شود. برای بازی، وایرگارد و OpenVPN. UDP باید روی هر دو سرور باز باشد.',
+  gmDescDir:'تانل کامل IP روی UDP با جبران خطای FEC. در حالت دایرکت، معادل گیمینگ همین است (KCP فقط در ریورز هست). UDP باید باز باشد.',
+  form:'مشخصات تانل',formNote:'این فرم را روی <b>سرور ایران</b> پر کن. در پایان یک لینک می‌گیری که روی سرور خارج در بخش «اتصال با لینک» می‌چسبانی.',
+  fName:'نام تانل',fIran:'آی‌پی یا دامنهٔ همین سرور ایران',fKharej:'آی‌پی یا دامنهٔ سرور خارج',fPort:'پورت تانل',
+  fPorts:'پورت‌های فورواردی',fPortsOpt:'پورت‌های فورواردی (خالی = فقط حالت TUN)',fPortsHint:'مثال: 443,2053,8080=80,10000-10010',
+  fToken:'توکن امنیتی',regen:'ساخت دوباره',
+  swUdp:'فوروارد UDP هم فعال شود',swUdpS:'علاوه بر TCP، ترافیک UDP روی همین پورت‌ها هم رد شود',
+  swPp:'ارسال آی‌پی واقعی کاربر',swPpS:'PROXY protocol — سرویس پشت تانل هم باید آن را بپذیرد',
+  swFb:'مسیر پشتیبان خودکار',swFbS:'اگر استیلث فیلتر شد، خودکار روی WSS و بعد TCP Mux برود',
+  fecT:'شدت جبران افت پکت',fecL:'سبک',fecB:'متعادل (پیشنهادی)',fecH:'سنگین',fecNote:'مسیر پرافت‌تر = جبران قوی‌تر، ولی پهنای باند بیشتری مصرف می‌شود.',
+  create:'ساخت تانل',createG:'ساخت تانل گیمینگ',working:'در حال ساخت…',
+  errReq:'این فیلدها را درست پر کن: ',errExists:'تانلی با این نام از قبل هست',errNet:'ارتباط با سرور برقرار نشد',
+  resT:'تانل ساخته و روشن شد',resFail:'تانل ساخته شد ولی سرویس روشن نشد — لاگ را ببین: journalctl -u backpack-',
+  step1:'این کانفیگ روی همین سرور ذخیره و اجرا شد:',step2:'روی سرور خارج، بخش «اتصال با لینک» را باز کن و این لینک را بچسبان:',
+  secret:'این لینک توکن تانل را دارد؛ فقط برای خودت نگهش دار.',
+  copy:'کپی',copied:'کپی شد',link:'لینک',restart:'ری‌استارت',restarted:'ری‌استارت شد',
+  listT:'تانل‌ها',none:'هنوز تانلی ساخته نشده.',remove:'حذف',removed:'تانل حذف شد',confirmDel:'این تانل حذف شود؟',
+  joinT:'اتصال با لینک',joinS:'روی سرور خارج، لینکی که پنل سرور ایران داده را اینجا بچسبان',
+  joinL:'لینک راه‌اندازی',joinBtn:'اتصال',joinBad:'این لینک معتبر نیست',joinOk:'تانل روی این سرور ساخته و روشن شد:',
+  created:'تانل ساخته شد',flowUsers:'کاربران',flowIran:'ایران',flowKharej:'خارج',flowSvc:'سرویس',listens:'منتظر',dials:'وصل می‌شود',
+  sideIran:'ایران',sideKharej:'خارج',active:'فعال',inactive:'خاموش',
+  f_name:'نام تانل',f_peer:'آی‌پی/دامنه',f_port:'پورت تانل',f_ports:'پورت‌ها',f_token:'توکن',
+ },
+ en:{
+  loginSub:'Sign in to the tunnel panel',password:'Password',signIn:'Sign in',loginFoot:'No username — password only',
+  badPw:'Wrong password',emptyPw:'Enter your password',blocked:'Too many attempts; wait 15 minutes',logout:'Log out',
+  navDash:'Dashboard',navReverse:'Reverse tunnel',navDirect:'Direct tunnel',navJoin:'Join with link',
+  dashT:'Dashboard',dashS:'This server and its tunnels',thisSrv:'This server',online:'Online',
+  cpu:'CPU',ram:'Memory',upt:'Uptime',hours:'h',
+  sTun:'Total tunnels',sAct:'Active tunnels',engineOk:'BackPack engine installed',engineNo:'BackPack engine not found — run install.sh again',
+  revT:'Reverse tunnel',revS:'The Iran server waits and the abroad server connects to it',
+  dirT:'Direct tunnel',dirS:'The Iran server connects out to the abroad server',
+  revWhen:'<b>When reverse?</b> When the Iran server can accept incoming connections from abroad. The most common setup and a good place to start.',
+  dirWhen:'<b>When direct?</b> When reverse won\'t connect because the Iran datacenter blocks inbound connections from abroad. Iran dials out, which is rarely filtered.',
+  stName:'TCP + Stealth',stTag:'Anti-filter',
+  stDesc:'Traffic is wrapped in a Noise layer, leaving no pattern for DPI. For V2Ray, panels, and when the connection itself is filtered.',
+  gmNameRev:'UDP + KCP + FEC',gmNameDir:'UDP + FEC',gmTag:'Gaming',
+  gmDescRev:'Lowest latency; packet loss is repaired without waiting for a resend. For gaming, WireGuard and OpenVPN. UDP must be open on both servers.',
+  gmDescDir:'A full IP tunnel over UDP with FEC error correction — the direct-mode gaming option (KCP exists only in reverse). UDP must be open.',
+  form:'Tunnel details',formNote:'Fill this on the <b>Iran server</b>. You\'ll get a link to paste on the abroad server under “Join with link”.',
+  fName:'Tunnel name',fIran:'This Iran server\'s IP or domain',fKharej:'Abroad server IP or domain',fPort:'Tunnel port',
+  fPorts:'Forwarded ports',fPortsOpt:'Forwarded ports (empty = TUN only)',fPortsHint:'e.g. 443,2053,8080=80,10000-10010',
+  fToken:'Security token',regen:'Regenerate',
+  swUdp:'Forward UDP too',swUdpS:'Carry UDP as well as TCP on these ports',
+  swPp:'Send real client IP',swPpS:'PROXY protocol — the service behind the tunnel must accept it',
+  swFb:'Automatic fallback',swFbS:'If stealth gets filtered, switch to WSS, then TCP Mux',
+  fecT:'Packet-loss recovery',fecL:'Light',fecB:'Balanced (recommended)',fecH:'Aggressive',fecNote:'A lossier route needs stronger recovery, at the cost of extra bandwidth.',
+  create:'Create tunnel',createG:'Create gaming tunnel',working:'Creating…',
+  errReq:'Please fix: ',errExists:'A tunnel with this name already exists',errNet:'Could not reach the server',
+  resT:'Tunnel created and running',resFail:'Tunnel created but the service did not start — check: journalctl -u backpack-',
+  step1:'This config was saved and started on this server:',step2:'On the abroad server, open “Join with link” and paste this link:',
+  secret:'This link contains the tunnel token; keep it to yourself.',
+  copy:'Copy',copied:'Copied',link:'Link',restart:'Restart',restarted:'Restarted',
+  listT:'Tunnels',none:'No tunnels yet.',remove:'Remove',removed:'Tunnel removed',confirmDel:'Remove this tunnel?',
+  joinT:'Join with link',joinS:'On the abroad server, paste the link the Iran server\'s panel gave you',
+  joinL:'Setup link',joinBtn:'Connect',joinBad:'This link isn\'t valid',joinOk:'The tunnel was created and started on this server:',
+  created:'Tunnel created',flowUsers:'Users',flowIran:'Iran',flowKharej:'Abroad',flowSvc:'Service',listens:'waits',dials:'connects',
+  sideIran:'Iran',sideKharej:'Abroad',active:'Active',inactive:'Stopped',
+  f_name:'name',f_peer:'IP/domain',f_port:'tunnel port',f_ports:'ports',f_token:'token',
+ }};
+let lang=(()=>{try{return localStorage.getItem('kanki_lang')||'fa'}catch(e){return 'fa'}})();
+const t=k=>I[lang][k]??k;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={page:'dash',status:null,list:[],reverse:{kind:'stealth',fec:'b',udp:false,pp:false,fb:true},
+  direct:{kind:'stealth',fec:'b',udp:false},result:null,join:null,busy:false};
+
+async function api(path,method='GET',body){
+  const r=await fetch('api/'+path,{method,credentials:'same-origin',
+    headers:method==='GET'?{}:{'Content-Type':'application/json','X-Kanki':'1'},
+    body:body?JSON.stringify(body):undefined});
+  let data={};try{data=await r.json()}catch(e){}
+  if(r.status===401&&path!=='login'){showLogin();throw new Error('auth')}
+  return {status:r.status,data};
+}
+function applyLang(){
+  document.documentElement.lang=lang;document.documentElement.dir=lang==='fa'?'rtl':'ltr';
+  document.querySelectorAll('[data-i]').forEach(e=>e.innerHTML=t(e.dataset.i));
+  document.querySelectorAll('[data-lang-btn]').forEach(b=>b.textContent=lang==='fa'?'EN':'فا');
+}
+function toggleLang(){saveForm();lang=lang==='fa'?'en':'fa';try{localStorage.setItem('kanki_lang',lang)}catch(e){}applyLang();if(!appHidden())render()}
+const appHidden=()=>document.getElementById('app').classList.contains('hidden');
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(window._t);window._t=setTimeout(()=>e.classList.remove('show'),2600)}
+function showLogin(){document.getElementById('app').classList.add('hidden');document.getElementById('login').classList.remove('hidden');applyLang();document.getElementById('pw').focus()}
+async function showApp(){document.getElementById('login').classList.add('hidden');document.getElementById('app').classList.remove('hidden');applyLang();await refresh();render()}
+
+async function login(){
+  const v=document.getElementById('pw').value,er=document.getElementById('loginErr');
+  if(!v){er.textContent=t('emptyPw');er.classList.remove('hidden');return}
+  const b=document.getElementById('loginBtn');b.disabled=true;
+  try{const r=await api('login','POST',{password:v});
+    if(r.status===200){er.classList.add('hidden');document.getElementById('pw').value='';showApp()}
+    else{er.textContent=t(r.status===429?'blocked':'badPw');er.classList.remove('hidden')}}
+  catch(e){er.textContent=t('errNet');er.classList.remove('hidden')}
+  b.disabled=false;
+}
+async function logout(){try{await api('logout','POST',{})}catch(e){}showLogin()}
+document.getElementById('pw').addEventListener('keydown',e=>{if(e.key==='Enter')login()});
+
+async function refresh(){
+  try{const [s,l]=await Promise.all([api('status'),api('tunnels')]);S.status=s.data;S.list=Array.isArray(l.data)?l.data:[]}catch(e){}
+}
+async function go(p){saveForm();S.page=p;S.result=null;document.querySelectorAll('.ni').forEach(n=>n.classList.toggle('on',n.dataset.p===p));await refresh();render();window.scrollTo(0,0)}
+const FIELDS=['name','peer','port','ports'];
+function saveForm(){const m=S[S.page];if(!m||!m.kind)return;FIELDS.forEach(f=>{const e=document.getElementById('f_'+f);if(e)m[f]=e.value})}
+
+function render(){
+  const c=document.getElementById('content');
+  c.innerHTML=S.page==='dash'?dash():S.page==='join'?joinPage():tunnelPage(S.page);
+}
+function dash(){
+  const s=S.status||{};
+  return `<div class="ph"><h2>${t('dashT')}</h2><p>${t('dashS')}</p></div>
+  ${s.engine===false?`<div class="warn">${t('engineNo')}</div>`:''}
+  <div class="servers"><div class="srv"><div class="h"><div><div class="t">${t('thisSrv')} · ${esc(s.host||'')}</div><div class="ip mono">${esc(s.ip||'—')}</div></div><span class="led">${t('online')}</span></div>
+    <div class="kv"><span>${t('cpu')}</span><span class="mono">${s.cpu??'—'}%</span></div>
+    <div class="kv"><span>${t('ram')}</span><span class="mono">${s.ram??'—'}%</span></div>
+    <div class="kv"><span>${t('upt')}</span><span class="mono">${s.uptime??'—'} ${t('hours')}</span></div></div></div>
+  <div class="stats">
+    <div class="st"><div class="k">${t('sTun')}</div><div class="v mono">${s.tunnels??0}</div></div>
+    <div class="st"><div class="k">${t('sAct')}</div><div class="v y mono">${s.active??0}</div></div>
+  </div>`;
+}
+function tunnelPage(mode){
+  const m=S[mode],rev=mode==='reverse',game=m.kind==='game',v=f=>esc(m[f]??'');
+  if(!m.token)newToken(mode);
+  const flow=rev
+    ?`<span class="node">${t('flowUsers')}</span><span class="arr">→</span><span class="node">${t('flowIran')}</span> (${t('listens')}) <span class="arr">←</span> <span class="node">${t('flowKharej')}</span> (${t('dials')}) <span class="arr">→</span><span class="node">${t('flowSvc')}</span>`
+    :`<span class="node">${t('flowUsers')}</span><span class="arr">→</span><span class="node">${t('flowIran')}</span> (${t('dials')}) <span class="arr">→</span> <span class="node">${t('flowKharej')}</span> (${t('listens')}) <span class="arr">→</span><span class="node">${t('flowSvc')}</span>`;
+  const peerPh=rev?(S.status?.ip||'5.200.10.20'):'91.99.10.20';
+  const fec=game?`<div class="sw" style="display:block"><div class="l" style="margin-bottom:10px">${t('fecT')}</div>
+    <div class="presets">${['l','b','h'].map(k=>`<button class="pr ${m.fec===k?'on':''}" onclick="setv('${mode}','fec','${k}')">${t('fec'+k.toUpperCase())}</button>`).join('')}</div>
+    <div class="s">${t('fecNote')}</div></div>`:'';
+  const list=S.list.filter(x=>x.mode===mode);
+  return `<div class="ph"><h2>${t(rev?'revT':'dirT')}</h2><p>${t(rev?'revS':'dirS')}</p></div>
+  <div class="seg">
+    <button class="opt st ${!game?'on':''}" onclick="setv('${mode}','kind','stealth')"><div class="n">${t('stName')} <span class="tag">${t('stTag')}</span></div><div class="s">${t('stDesc')}</div></button>
+    <button class="opt game ${game?'on':''}" onclick="setv('${mode}','kind','game')"><div class="n">${t(rev?'gmNameRev':'gmNameDir')} <span class="tag">${t('gmTag')}</span></div><div class="s">${t(rev?'gmDescRev':'gmDescDir')}</div></button>
+  </div>
+  <div class="card"><div class="ct">${t('form')}</div>
+    <div class="cn">${t(rev?'revWhen':'dirWhen')}<br>${t('formNote')}</div>
+    <div class="flow">${flow}</div>
+    <div class="g2">
+      <div class="field"><label for="f_name">${t('fName')}</label><input id="f_name" class="input" value="${v('name')}" placeholder="${game?'game-de':'stealth-de'}"></div>
+      <div class="field"><label for="f_peer">${t(rev?'fIran':'fKharej')}</label><input id="f_peer" class="input mono" value="${v('peer')}" placeholder="${esc(peerPh)}"></div>
+      <div class="field"><label for="f_port">${t('fPort')}${game?' (UDP)':''}</label><input id="f_port" class="input mono" inputmode="numeric" value="${v('port')}" placeholder="${game?'7000':'443'}"></div>
+      <div class="field"><label for="f_ports">${t(game&&!rev?'fPortsOpt':'fPorts')}</label><input id="f_ports" class="input mono" value="${v('ports')}" placeholder="${t('fPortsHint')}"></div>
+    </div>
+    <div class="field"><label>${t('fToken')}</label><div style="display:flex;gap:8px"><input class="input mono" readonly value="${esc(m.token||'')}"><button class="chip" onclick="saveForm();newToken('${mode}',true)">${t('regen')}</button></div></div>
+    ${fec}
+    ${!game?sw(mode,'udp','swUdp','swUdpS'):''}
+    ${rev&&!game?sw(mode,'pp','swPp','swPpS'):''}
+    ${rev&&!game?sw(mode,'fb','swFb','swFbS'):''}
+    <div class="actions"><button class="btn ${game?'g':''}" ${S.busy?'disabled':''} onclick="create('${mode}')">${S.busy?t('working'):t(game?'createG':'create')}</button></div>
+    <div class="errmsg hidden" id="formErr"></div></div>
+  ${S.result&&S.result.mode===mode?result(S.result):''}
+  <div class="card"><div class="ct" style="margin-bottom:12px">${t('listT')}</div>
+    <div class="tl">${list.length?list.map(row).join(''):`<div class="empty">${t('none')}</div>`}</div></div>`;
+}
+function sw(mode,key,l,s){const on=!!S[mode][key];return `<div class="sw"><div><div class="l">${t(l)}</div><div class="s">${t(s)}</div></div>
+  <button class="tg" role="switch" aria-checked="${on}" aria-label="${t(l)}" onclick="setv('${mode}','${key}',${!on})"></button></div>`}
+function row(x){const game=x.kind==='game',on=x.state==='active';
+  return `<div class="tr"><div style="flex:1;min-width:0">
+   <div class="nm">${esc(x.name)}<span class="bd ${game?'game':'st'}">${game?t('gmTag'):t('stTag')}</span><span class="side">${t(x.side==='iran'?'sideIran':'sideKharej')}</span></div>
+   <div class="mt mono">${esc(x.peer)}:${esc(x.port)}${x.ports&&x.ports.length?' · '+esc(x.ports.join(',')):''}</div></div>
+   <span class="state ${on?'active':'off'}">${t(on?'active':'inactive')}</span>
+   <div class="acts">${x.side==='iran'?`<button class="del" onclick="showLink('${esc(x.name)}')">${t('link')}</button>`:''}
+   <button class="del" onclick="restartT('${esc(x.name)}')">${t('restart')}</button>
+   <button class="del" onclick="removeT('${esc(x.name)}')">${t('remove')}</button></div></div>`}
+function result(r){return `<div class="card res"><h3>${r.ok?t('resT'):esc(t('resFail')+r.name)}</h3>
+  ${r.config?`<div class="step"><div class="num">1</div><div class="b"><p>${t('step1')} <span class="mono">/etc/backpack/${esc(r.name)}.toml</span></p>${code(r.config)}</div></div>`:''}
+  <div class="step"><div class="num">${r.config?2:'→'}</div><div class="b"><p>${t('step2')}</p>${code(r.link)}<p style="margin-top:8px">${t('secret')}</p></div></div></div>`}
+let CODES=[];
+function code(s){CODES.push(s);return `<div class="code mono"><button class="chip copy" onclick="copyTxt(${CODES.length-1})">${t('copy')}</button>${esc(s)}</div>`}
+function copyTxt(i){const s=CODES[i];(navigator.clipboard?navigator.clipboard.writeText(s):Promise.reject()).then(()=>toast(t('copied'))).catch(()=>{const a=document.createElement('textarea');a.value=s;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast(t('copied'))}catch(e){}a.remove()})}
+
+function joinPage(){const j=S.join||{};
+  return `<div class="ph"><h2>${t('joinT')}</h2><p>${t('joinS')}</p></div>
+  <div class="card"><div class="field"><label for="joinIn">${t('joinL')}</label><textarea id="joinIn" class="input mono" placeholder="kanki://…">${esc(j.raw||'')}</textarea></div>
+  <div class="actions"><button class="btn" ${S.busy?'disabled':''} onclick="doJoin()">${S.busy?t('working'):t('joinBtn')}</button></div>
+  <div class="errmsg ${j.err?'':'hidden'}">${esc(j.err||'')}</div></div>
+  ${j.config?`<div class="card res"><h3>${t('joinOk')}</h3>${code(j.config)}</div>`:''}
+  <div class="card"><div class="ct" style="margin-bottom:12px">${t('listT')}</div><div class="tl">${S.list.filter(x=>x.side==='kharej').map(row).join('')||`<div class="empty">${t('none')}</div>`}</div></div>`}
+
+async function newToken(mode,redraw){try{const r=await api('token','POST',{});S[mode].token=r.data.token}catch(e){}if(redraw||S.page===mode)render()}
+function setv(mode,k,val){saveForm();S[mode][k]=val;if(k==='kind')S.result=null;render()}
+async function create(mode){
+  saveForm();const m=S[mode];
+  const body={mode,kind:m.kind,name:(m.name||'').trim(),peer:(m.peer||'').trim(),port:(m.port||'').trim(),ports:(m.ports||'').trim(),
+    token:m.token,fec:m.fec,udp:!!m.udp,pp:!!m.pp,fb:!!m.fb};
+  S.busy=true;render();
+  try{const r=await api('tunnels','POST',body);S.busy=false;
+    if(r.status===200){S.result={mode,name:body.name,ok:r.data.ok,config:r.data.config,link:r.data.link};
+      Object.assign(m,{name:'',peer:m.peer,port:'',ports:'',token:''});await refresh();render();toast(t('created'));
+      document.querySelector('.res')?.scrollIntoView({behavior:'smooth',block:'start'});return}
+    render();const er=document.getElementById('formErr');
+    if(r.status===409)er.textContent=t('errExists');
+    else{const f=(r.data.fields||[]);f.forEach(x=>document.getElementById('f_'+x)?.classList.add('err'));er.textContent=t('errReq')+f.map(x=>t('f_'+x)).join('، ')}
+    er.classList.remove('hidden');
+  }catch(e){S.busy=false;render();if(e.message!=='auth')toast(t('errNet'))}
+}
+async function showLink(name){try{const r=await api('tunnels/'+encodeURIComponent(name)+'/link');
+  if(r.status===200){S.result={mode:S.page,name,ok:true,link:r.data.link};render();document.querySelector('.res')?.scrollIntoView({behavior:'smooth'})}}catch(e){}}
+async function restartT(name){try{await api('tunnels/'+encodeURIComponent(name)+'/restart','POST',{});toast(t('restarted'));await refresh();render()}catch(e){}}
+async function removeT(name){if(!confirm(t('confirmDel')+' ('+name+')'))return;
+  try{await api('tunnels/'+encodeURIComponent(name),'DELETE');S.result=null;await refresh();render();toast(t('removed'))}catch(e){}}
+async function doJoin(){const raw=document.getElementById('joinIn').value.trim();S.busy=true;S.join={raw};render();
+  try{const r=await api('join','POST',{link:raw});S.busy=false;
+    if(r.status===200)S.join={raw:'',config:r.data.config};
+    else S.join={raw,err:t(r.status===409?'errExists':'joinBad')};
+    await refresh();render()}catch(e){S.busy=false;render()}}
+
+(async()=>{applyLang();try{const r=await api('session');r.data.ok?showApp():showLogin()}catch(e){showLogin()}
+  setInterval(async()=>{if(!appHidden()&&document.activeElement?.tagName!=='INPUT'&&S.page==='dash'){await refresh();render()}},10000)})();
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+Kanki Tunnel
+
+Tunnel engine: Based on BackPack by Amin Mohammadi (AminMGMT)
+https://github.com/AminMGMT/BackPack
+
+Kanki does not include or modify BackPack's source code. The installer downloads
+the official, unmodified BackPack release binary and verifies its checksum.
+BackPack is licensed under AGPL-3.0; "BackPack" is a mark of its author.
